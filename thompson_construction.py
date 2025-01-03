@@ -5,6 +5,7 @@ from typing import Callable, List
 def EPSILON(_):
     return False
 
+
 class State:
     pass
 
@@ -30,25 +31,31 @@ class Graph:
     end: State
     rules: List[Rule]
 
+
 def match_eq(c):
-    return lambda x: x==c
+    return lambda x: x == c
+
 
 def single_char(char: str) -> Graph:
     start, end = State(), State()
     return Graph(char, start, end, [Rule(start, match_eq(char), end)])
+
 
 # example = single_char('h')
 # rule = example.rules[0]
 # rule.match('h') -> True
 # rule.match('j') -> False
 
+
 # . in regex
 def match_any():
     return lambda _: True
 
+
 def any_char() -> Graph:
     start, end = State(), State()
     return Graph(".", start, end, [Rule(start, match_any(), end)])
+
 
 # example = single_char('h')
 # rule = example.rules[0]
@@ -58,6 +65,7 @@ def any_char() -> Graph:
 # * Kleene Star
 # 0 or more repetitions
 
+
 def zero_or_more(test: Graph) -> Graph:
     start, end = State(), State()
     label = "(" + test.label + ")*"
@@ -66,16 +74,18 @@ def zero_or_more(test: Graph) -> Graph:
         start,
         end,
         [
-            Rule(start, EPSILON, end), # 0 occurances
-            Rule(start, EPSILON, test.start), # empty transition to start of test
-            Rule(test.end, EPSILON, end), # empty transition to end
-            Rule(test.end, EPSILON, test.start) # looping over test
-        ]
+            Rule(start, EPSILON, end),  # 0 occurances
+            Rule(start, EPSILON, test.start),  # empty transition to start of test
+            Rule(test.end, EPSILON, end),  # empty transition to end
+            Rule(test.end, EPSILON, test.start),  # looping over test
+        ],
     )
+
 
 # Concatentation
 
-def concat(left: Graph, right:Graph) -> Graph:
+
+def concat(left: Graph, right: Graph) -> Graph:
     label = left.label + right.label
     start = left.start
     end = right.end
@@ -83,9 +93,11 @@ def concat(left: Graph, right:Graph) -> Graph:
         label,
         start,
         end,
-        [
-            *left.rules,
-            *right.rules,
-            Rule(right.start, match_eq(), end)
-        ]
+        [*left.rules, *right.rules, Rule(right.start, match_eq(), end)],
     )
+
+
+# TODO
+# One or more +
+# Union |
+# Optional ?
