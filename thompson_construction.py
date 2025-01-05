@@ -74,6 +74,7 @@ def zero_or_more(test: Graph) -> Graph:
         start,
         end,
         [
+            *test.rules,
             Rule(start, EPSILON, end),  # 0 occurances
             Rule(start, EPSILON, test.start),  # empty transition to start of test
             Rule(test.end, EPSILON, end),  # empty transition to end
@@ -93,11 +94,61 @@ def concat(left: Graph, right: Graph) -> Graph:
         label,
         start,
         end,
-        [*left.rules, *right.rules, Rule(right.start, match_eq(), end)],
+        [*left.rules, *right.rules, Rule(left.end, EPSILON, right.start)],
     )
 
 
-# TODO
 # One or more +
+def one_or_more(test: Graph) -> Graph:
+    start, end = State(), State()
+    label = "(" + test.label + ")+"
+    return Graph(
+        label,
+        start,
+        end,
+        [
+            *test.rules,
+            # no direct path from start to end
+            Rule(start, EPSILON, test.start),  # empty transition to start of test
+            Rule(test.end, EPSILON, end),  # empty transition to end
+            Rule(test.end, EPSILON, test.start),  # looping over test
+        ],
+    )
+
+
 # Union |
+def union(left: Graph, right: Graph) -> Graph:
+    label = "(" + left.label + "|" + right.label + ")"
+    start, end = State(), State()
+    return Graph(
+        label,
+        start,
+        end,
+        [
+            *left.rules,
+            *right.rules,
+            Rule(start, EPSILON, left.start),
+            Rule(left.end, EPSILON, end),
+            Rule(start, EPSILON, right.start),
+            Rule(right.end, EPSILON, end),
+        ],
+    )
+
+
 # Optional ?
+# zero or one
+def optional(test: Graph) -> Graph:
+    label = "(" + test.label + ")?"
+    start, end = State(), State()
+    return Graph(
+        label,
+        start,
+        end,
+        [
+            *test.rules,
+            Rule(start, EPSILON, test.start),
+            Rule(test.end, EPSILON, end),
+            Rule(start, EPSILON, end),
+            # no looping over from test endd to test start
+        ],
+    )
