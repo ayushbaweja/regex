@@ -1,0 +1,1 @@
+# Generates all (or limited by a maximum length) strings produced by given grammar

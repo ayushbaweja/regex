@@ -8,6 +8,7 @@ from thompson_construction import (
     optional,
 )
 from evaluator import Evaluator
+from language import generate
 
 def test_single_char():
     # Test pattern: 'a'
